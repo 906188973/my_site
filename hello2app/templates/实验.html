@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% load static %}
+    <p>{{ views_list }}</p>
+    <p>{{ views_list.0 }}</p>
+    {% for i in views_list %}
+    {{ i }}
+    {% endfor %}
+    <img src="{% static 'images/1.png' %}">
+</body>
+</html>
