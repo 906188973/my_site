@@ -7,9 +7,16 @@ def index(request):
 
 def register(request):
     """注册"""
-    form = RegisterModelForm()
-    context = {'form': form}
-    return render(request, 'web/register.html', context)
+    if request.method == 'GET':
+        form = RegisterModelForm()
+        context = {'form': form}
+        return render(request, 'web/register.html', context)
+
+    form = RegisterModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'status': True, 'data': 'web/login/'})
+    return JsonResponse({'status': False, 'error': form.errors})
 
 def send_sms(request):
     """发送短信"""

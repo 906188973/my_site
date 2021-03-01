@@ -18,7 +18,8 @@
 {% block content %}
 <h1 style="text-align:center;">注册</h1>
 <div class="account">
-    <form>
+    <form id="regForm" method="POST" novalidate>
+        {% csrf_token %}
         {% for field in form %}
             {% if field.name == 'code' %}
             <div class="form-group">
@@ -29,7 +30,7 @@
                         <span class="error-msg"></span>
                     </div>
                      <div class="col-md-6">
-                         <input id="btnSms" type="submit" class="btn btn-default" value='点击获取验证码'>
+                         <input id="btnSms" type="button" class="btn btn-default" value='点击获取验证码'>
                      </div>
                  </div>
             </div>
@@ -41,7 +42,7 @@
             </div>
             {% endif %}
         {% endfor %}
-      <button type="submit" class="btn btn-primary">注册</button>
+      <input id="btnSubmit" type="button" class="btn btn-primary" value='注册'>
     </form>
 </div>
 
@@ -51,6 +52,7 @@
     <script>
         $(function (){
             bindClickBtnSms();
+            bindClickSubmit();
         });
         //点击获取验证吗的按键事件
         function bindClickBtnSms() {
@@ -82,7 +84,6 @@
                 })
             })
         }
-
         //倒计时
         function sendSmsRemind() {
             var $smsBtn = $('#btnSms');
@@ -97,6 +98,29 @@
                     $smsBtn.val('点击获取验证码').prop('disabled', false);
                 }
             }, 1000)
+        }
+        //点击提交（注册）
+        function bindClickSubmit() {
+            $('#btnSubmit').click(function (){
+                $('.error-msg').empty();
+                //收集表单中的数据（找到每一个字段） $('#regForm').serialize()
+                //数据ajax发送到后台
+                $.ajax({
+                    url:"{% url 'web:register' %}",
+                    type:"POST",
+                    data:$('#regForm').serialize(), //所以字段数据 + csrf token
+                    dataType:"JSON",
+                    success:function (res) {
+                        if(res.status){
+                            location.href =res.data;
+                        }else{
+                            $.each(res.error, function(key, value){
+                                $("#id_" +key).next().text(value[0]);
+                            })
+                        }
+                    }
+                })
+            })
         }
     </script>
 {% endblock %}
